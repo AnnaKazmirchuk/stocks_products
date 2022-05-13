@@ -32,7 +32,11 @@ class StockSerializer(serializers.ModelSerializer):
         print(stock)
 
         for position in positions:
-            StockProduct.objects.create(stock_id=stock.id)
+            StockProduct.objects.create(stock_id=stock.id,
+            product = position.get('product'),
+            quantity = position.get('quantity'),
+            price = position.get('price')
+            )
         return stock
 
 
@@ -43,13 +47,13 @@ class StockSerializer(serializers.ModelSerializer):
         # обновляем склад по его параметрам
         stock = super().update(instance, validated_data)
 
-        for position_data in positions_data:
-            obj, created = StockProduct.objects.filter(stock_id=stock.id).update_or_create(
+        for position in positions:
+            StockProduct.objects.update_or_create(
                 stock=stock,
-                product = position_data['product'],
+                product = position.get('product'),
                 defaults={
-                    'quantity': position_data['quantity'],
-                    'price': position_data['price']
+                    'quantity': position.get('quantity'),
+                    'price': position.get('price')
                 }
             )
         return stock
